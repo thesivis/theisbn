@@ -9,6 +9,7 @@ pip install djangorestframework
 pip install django
 pip install django-cors-headers
 pip install mysql-connector-python
+pip install mysqlclient
 ```
 
 ## Criando a aplicação
@@ -41,4 +42,8 @@ database = theisbn
 user = <USUARIO>
 password = <SENHA>
 default-character-set = utf8
+```
+Volte para o terminal e digite:
+```
+python manage.py migrate
 ```

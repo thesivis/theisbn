@@ -10,6 +10,7 @@ pip install django
 pip install django-cors-headers
 pip install mysql-connector-python
 pip install mysqlclient
+pip install beautifulsoup4
 ```
 
 ## Criando a aplicação

@@ -49,3 +49,37 @@ Volte para o terminal e digite:
 ```
 python manage.py migrate
 ```
+
+## Configurando o request
+
+No arquivo theisbnapi/views.py crie o método para receber a requisição
+```
+from django.http import JsonResponse
+
+def get_isbn(request):
+    data = request.REQUEST
+    return JsonResponse(data)
+```
+
+Crie o arquivo theisbnapi/urls.py e coloque:
+```
+from . import views
+from django.conf.urls import url
+
+urlpatterns = [
+    url(r'^isbn/$', views.get_isbn, name='isbn-detail'),
+]
+```
+
+No arquivo theisbn/urls.py configure a api:
+```
+from django.contrib import admin
+from django.urls import path
+from django.conf.urls import url, include
+
+urlpatterns = [
+    url(r'^', include('theisbnapi.urls')),
+    path('admin/', admin.site.urls),
+]
+```
+

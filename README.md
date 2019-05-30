@@ -28,17 +28,19 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
-            'read_default_file': './my.cnf',
+            'read_default_file': os.path.join(BASE_DIR, 'my.cnf'),
         },
     }
 }
 ...
 ```
 
-Crie o arquivo my.cnf e coloque as configurações:
+Crie o arquivo <BASE_DIR>/my.cnf e coloque as configurações:
 ```
 [client]
 database = theisbn
+host = 127.0.0.1
+port = 3306
 user = <USUARIO>
 password = <SENHA>
 default-character-set = utf8

@@ -57,7 +57,7 @@ No arquivo theisbnapi/views.py crie o método para receber a requisição
 from django.http import JsonResponse
 
 def get_isbn(request):
-    data = request.REQUEST
+    data = {"status":"200"}
     return JsonResponse(data)
 ```
 

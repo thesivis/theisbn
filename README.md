@@ -50,6 +50,25 @@ Volte para o terminal e digite:
 python manage.py migrate
 ```
 
+## Configurando o settings.py
+
+Na seção INSTALLED_APPS adicione:
+```
+'theisbnapi',
+'rest_framework',
+'corsheaders'
+```
+Já na seção de MIDDLEWARE adicione antes de CommonMiddleware:
+```
+'corsheaders.middleware.CorsMiddleware',
+'django.middleware.common.CommonMiddleware',
+```
+E por fim ao final do arquivo adicione:
+```
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = False
+```
+
 ## Configurando o request
 
 No arquivo theisbnapi/views.py crie o método para receber a requisição

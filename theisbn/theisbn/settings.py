@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'theisbnapi',
     'rest_framework',
     'corsheaders',
+    'bs4',
 ]
 
 MIDDLEWARE = [

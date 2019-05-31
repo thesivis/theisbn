@@ -7,5 +7,7 @@ import theisbnapi.chain_node.nodes as node
 def get_isbn(request):
     data = request.GET
     if('isbn' in request.GET):
-        data = node.chain().search(request.GET['isbn'])
+        data = node.chain().search(request.GET)
+        if(data['status'] == 'ok'):
+            print('ok')
     return JsonResponse(data)

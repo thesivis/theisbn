@@ -157,12 +157,32 @@ class OpenLibraryAPINode(AbstractNode):
         ret = super().search(request)
         return ret
 
+class ISBNDBAPINode(AbstractNode):
+
+    def search(self, request) -> str:
+        h = {'Authorization': 'YOUR_REST_KEY'}
+        url = "https://api2.isbndb.com/book/" + request['isbn']
+        req = requests.get(url, headers=h)
+        if req.status_code == 200:
+            obj = req.json()
+            livro = {}
+            livro['isbn13'] = obj['isbn13']
+            livro['isbn10'] = obj['isbn']
+            livro['authors'] = ';'.join(obj['authors'])
+            livro['title'] = obj['title']
+
+            return {"status":"ok", "book": livro}
+                
+        ret = super().search(request)
+        return ret
+
 
 def chain():
     local = LocalNode()
     isbnSearch = ISBNSearchNode()
     googleBook = GoogleBookAPINode()
     openlibrary = OpenLibraryAPINode()
-    local.next(googleBook).next(openlibrary).next(isbnSearch)
+    isbndb = ISBNDBAPINode()
+    local.next(googleBook).next(openlibrary).next(isbndb).next(isbnSearch)
 
     return local

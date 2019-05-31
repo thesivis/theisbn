@@ -176,6 +176,11 @@ class ISBNDBAPINode(AbstractNode):
         ret = super().search(request)
         return ret
 
+class FimNode(AbstractNode):
+
+    def search(self, request) -> str:
+        return {"status":"erro"}
+
 
 def chain():
     local = LocalNode()
@@ -183,6 +188,7 @@ def chain():
     googleBook = GoogleBookAPINode()
     openlibrary = OpenLibraryAPINode()
     isbndb = ISBNDBAPINode()
-    local.next(googleBook).next(openlibrary).next(isbndb).next(isbnSearch)
+    fim = FimNode()
+    local.next(googleBook).next(openlibrary).next(isbndb).next(isbnSearch).next(FimNode)
 
     return local

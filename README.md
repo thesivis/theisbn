@@ -12,6 +12,7 @@ pip install mysql-connector-python
 pip install mysqlclient
 pip install bs4
 pip install requests
+pip install dicttoxml
 ```
 
 ## Criando a aplicação
@@ -132,6 +133,6 @@ class ISBN(models.Model):
 
 Depois de criados os modelos no arquivo models.py, execute os comandos:
 ```
-python manage.py makemigratios
+python manage.py makemigrations theisbnapi
 python manage.py migrate
 ```

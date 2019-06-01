@@ -12,6 +12,7 @@ pip install mysql-connector-python
 pip install mysqlclient
 pip install bs4
 pip install requests
+pip install dicttoxml
 ```
 
 ## Criando a aplicação

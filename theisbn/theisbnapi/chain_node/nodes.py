@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import requests
 import json
 from django.core import serializers
+from django.conf import settings
 
 class Node(ABC):
 
@@ -45,7 +46,7 @@ class LocalNode(AbstractNode):
             return {"status":"ok", "book": obj[0]['fields']}
         except ISBN.DoesNotExist:
             ret = super().search(request)
-            if(ret['status'] == 'ok' and False):
+            if(ret['status'] == 'ok' and settings.GRAVAR_LOCAL):
                 isbn = ISBN()
                 isbn.isbn13 = ret['book']['isbn13']
                 isbn.isbn10 = ret['book']['isbn10']

@@ -133,6 +133,6 @@ class ISBN(models.Model):
 
 Depois de criados os modelos no arquivo models.py, execute os comandos:
 ```
-python manage.py makemigratios
+python manage.py makemigrations theisbnapi
 python manage.py migrate
 ```

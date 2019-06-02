@@ -13,6 +13,8 @@ pip install mysqlclient
 pip install bs4
 pip install requests
 pip install dicttoxml
+pip install pytesseract
+pip install Pillow
 ```
 
 ## Criando a aplicação

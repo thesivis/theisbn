@@ -12,54 +12,26 @@ from django.conf import settings
 class Node(ABC):
 
     @abstractmethod
-    def next(self, no : 'Node') -> 'Node':
-        pass
-
-    @abstractmethod
     def search(self, parametros):
         pass
 
 
-class AbstractNode(Node):
-
-    _next: Node = None
-
-    def next(self, no: Node) -> Node:
-        self._next = no
-        return no
-
-    @abstractmethod
-    def search(self, request) -> str:
-        if self._next:
-            return self._next.search(request)
-
-        return None
-
-
-class LocalNode(AbstractNode):
+class LocalNode(Node):
 
     def search(self, request) -> str:
+        print(self.__class__.__name__)
         try:
             query = ISBN.objects.get(Q(isbn13=request['isbn'])| Q(isbn10=request['isbn']))
             fields = serializers.serialize('json',[query,])
             obj = json.loads(fields)
-            return {"status":"ok", "book": obj[0]['fields']}
+            return {"status":"ok",'type':self.__class__.__name__, "book": obj[0]['fields']}
         except ISBN.DoesNotExist:
-            ret = super().search(request)
-            if(ret['status'] == 'ok' and settings.GRAVAR_LOCAL):
-                isbn = ISBN()
-                isbn.isbn13 = ret['book']['isbn13']
-                isbn.isbn10 = ret['book']['isbn10']
-                isbn.authors = ret['book']['authors']
-                isbn.title = ret['book']['title']
-                isbn.save()
-            return ret
-        return {"status":"erro2"}
+            return {"status":"erro"}
 
-class ISBNSearchNode(AbstractNode):
+class ISBNSearchNode(Node):
 
     def search(self, request) -> str:
-        print('chego2')
+        print(self.__class__.__name__)
         data = {
             'searchQuery': request['isbn'],
             'searchSubmit':''
@@ -97,14 +69,13 @@ class ISBNSearchNode(AbstractNode):
             soup = BeautifulSoup(content, 'html.parser')
             book = soup.find(name='div',attrs={"class":'bookinfo'})
             print(book)
-        else:
-            ret = super().search(request)
-            return ret
-        return {"status":"erro3"}
 
-class GoogleBookAPINode(AbstractNode):
+        return {"status":"erro"}
+
+class GoogleBookAPINode(Node):
 
     def search(self, request) -> str:
+        print(self.__class__.__name__)
         url = "https://www.googleapis.com/books/v1/volumes?q=isbn:" + request['isbn']
         req = requests.get(url)
         if req.status_code == 200:
@@ -129,13 +100,14 @@ class GoogleBookAPINode(AbstractNode):
                 livro['authors'] = ';'.join(book['authors'])
                 livro['title'] = book['title']
 
-                return {"status":"ok", "book": livro}
+                return {"status":"ok",'type':self.__class__.__name__, "book": livro}
 
-        return {"status":"erro4"}
+        return {"status":"erro"}
 
-class OpenLibraryAPINode(AbstractNode):
+class OpenLibraryAPINode(Node):
 
     def search(self, request) -> str:
+        print(self.__class__.__name__)
         url = "https://openlibrary.org/api/books?bibkeys=ISBN:" + request['isbn']+"&format=json&jscmd=data"
         req = requests.get(url)
         if req.status_code == 200:
@@ -153,14 +125,14 @@ class OpenLibraryAPINode(AbstractNode):
                 livro['authors'] = ';'.join([a['name'] for a in book['authors']])
                 livro['title'] = book['title']
 
-                return {"status":"ok", "book": livro}
+                return {"status":"ok",'type':self.__class__.__name__, "book": livro}
                 
-        ret = super().search(request)
-        return ret
+        return {"status":"erro"}
 
-class ISBNDBAPINode(AbstractNode):
+class ISBNDBAPINode(Node):
 
     def search(self, request) -> str:
+        print(self.__class__.__name__)
         h = {'Authorization': 'YOUR_REST_KEY'}
         url = "https://api2.isbndb.com/book/" + request['isbn']
         req = requests.get(url, headers=h)
@@ -172,24 +144,32 @@ class ISBNDBAPINode(AbstractNode):
             livro['authors'] = ';'.join(obj['authors'])
             livro['title'] = obj['title']
 
-            return {"status":"ok", "book": livro}
+            return {"status":"ok",'type':self.__class__.__name__, "book": livro}
                 
-        ret = super().search(request)
-        return ret
 
-class FimNode(AbstractNode):
-
-    def search(self, request) -> str:
         return {"status":"erro"}
 
-
-def chain():
+def search(isbn):
     local = LocalNode()
     isbnSearch = ISBNSearchNode()
     googleBook = GoogleBookAPINode()
     openlibrary = OpenLibraryAPINode()
     isbndb = ISBNDBAPINode()
-    fim = FimNode()
-    local.next(googleBook).next(openlibrary).next(isbndb).next(isbnSearch).next(FimNode)
 
-    return local
+    chain = [local, googleBook, openlibrary, isbndb, isbnSearch]
+
+    for no in chain:
+        ret = no.search(isbn)
+        if(ret['status'] == 'ok'):
+            if(ret['type'] != 'LocalNode'):
+                if(settings.GRAVAR_LOCAL):
+                    isbn = ISBN()
+                    isbn.isbn13 = ret['book']['isbn13']
+                    isbn.isbn10 = ret['book']['isbn10']
+                    isbn.authors = ret['book']['authors']
+                    isbn.title = ret['book']['title']
+                    isbn.save()
+            del ret['type']
+            return ret
+
+    return {"status":"erro"}

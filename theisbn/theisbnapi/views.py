@@ -10,7 +10,7 @@ from dicttoxml import dicttoxml
 def get_isbn(request):
     data = request.GET
     if('isbn' in request.GET):
-        data = node.chain().search(request.GET)
+        data = node.search(request.GET)
         if('format' in request.GET):
             if(request.GET['format'] == 'xml'):
                 data = dicttoxml(data)
@@ -31,7 +31,7 @@ def get_isbns(request):
         response = []
         for isbn in isbns:
             parametros['isbn'] = isbn
-            data = node.chain().search(parametros)
+            data = node.search(parametros)
             data['isbn'] = isbn
             response.append(data)
         if('format' in request.GET):

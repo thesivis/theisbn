@@ -4,6 +4,8 @@ import argparse
 import requests
 from bs4 import BeautifulSoup
 import datetime
+import random
+import os
 try:
     import Image
 except ImportError:
@@ -11,10 +13,21 @@ except ImportError:
 from subprocess import check_output
 
 
-def resolve(path, sample):
-	print("Resampling the Image")
-	check_output(['convert', path, '-resample', sample, 'saida.jpeg'])
-	return pytesseract.image_to_string(Image.open('saida.jpeg'), lang='eng', config='--oem 3')
+def resolve(path):
+    print("Resampling the Image")
+    samples = [100,200,300,400,500,600]
+    chave = str(random.getrandbits(128))+'.jpeg'
+    ranking = {}
+    for sample in samples:
+        check_output(['convert', path, '-resample', str(sample), chave])
+        valor = pytesseract.image_to_string(Image.open(chave), lang='eng', config='--oem 3')
+        if(valor not in ranking):
+            ranking[valor] = 0
+        ranking[valor] = ranking[valor] + 1
+    valores = sorted(ranking.items(), key = lambda kv:(kv[1], kv[0]), reverse=True)
+    print(valores)
+    #os.remove(chave)
+    return valores[0][0]
 
 if __name__=="__main__":
     '''argparser = argparse.ArgumentParser()
@@ -52,9 +65,8 @@ if __name__=="__main__":
     
     #args = argparser.parse_args()
     path = 'imagem.jpeg'
-    sample = '100'
     print('Resolving Captcha')
-    captcha_text = resolve(path,sample).replace(' ','')
+    captcha_text = resolve(path).replace(' ','')
     print('Extracted Text',captcha_text)
     
     h = {

@@ -15,6 +15,7 @@ pip install requests
 pip install dicttoxml
 pip install pytesseract
 pip install Pillow
+apt-get install tesseract-ocr tesseract-ocr-eng tesseract-ocr-por
 ```
 
 ## Criando a aplicação

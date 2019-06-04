@@ -20,7 +20,7 @@ def resolve(path):
     ranking = {}
     for sample in samples:
         check_output(['convert', path, '-resample', str(sample), chave])
-        valor = pytesseract.image_to_string(Image.open(chave), lang='eng', config='--oem 3')
+        valor = pytesseract.image_to_string(Image.open(chave), lang='eng', config='--oem 3').replace(' ','')
         if(valor not in ranking):
             ranking[valor] = 0
         ranking[valor] = ranking[valor] + 1
@@ -94,8 +94,14 @@ if __name__=="__main__":
                     texto = d.text.strip().replace('Participações ','').replace('ISBN ','').replace('Título ','').replace('Edição ','').replace('Tipo de Suporte ','').replace('Páginas ','').replace('Editor(a) ','').replace('Editor(a) ','').strip()
                     if('Participações' in texto):
                         print(texto)
-                        texto = texto.replace('\n','')
-                        print(texto)
+                        print(texto.split('\n'))
+                        linhas = texto.split('\n')
+                        autores = ''
+                        for linha in linhas:
+                            if('( Autor)' in linha):
+                                autor = linha.replace('\r','').replace('( Autor)','').strip()
+                                autores = autores + ';' + autor
+                        print(autores[1:])
         tentativa = tentativa + 1
     
     print(book)

@@ -194,10 +194,8 @@ class ISBNBrAPINode(Node):
             r = s.get(caminho, headers=h)
             path = str(random.getrandbits(128))+'.jpeg'
             open(path, 'wb').write(r.content)
-            print('Resolving Captcha')
             captcha_text = resolve(path).replace(' ','')
             os.remove(path)
-            print('Extracted Text',captcha_text)
             
             h = {
                 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:67.0) Gecko/20100101 Firefox/67.0',
@@ -209,7 +207,7 @@ class ISBNBrAPINode(Node):
                 'Cookie': 'JSESSIONID='+jsessionid
             }
             url = 'http://www.isbn.bn.br/website/consulta/cadastro/filtrar'
-            req = s.post(url, data={'campo':'1','valor':'9788573289206','imagemCaptcha':captcha_text},headers=h)
+            req = s.post(url, data={'campo':'1','valor':request['isbn'],'imagemCaptcha':captcha_text},headers=h)
             soup = BeautifulSoup(req.text, 'html.parser')
             book = soup.find(name='span',attrs={"id":'imagemCaptcha.errors'})
             if(book == None):
@@ -223,11 +221,17 @@ class ISBNBrAPINode(Node):
                         texto = d.text.strip()
                         
                         if('ISBN' in texto):
-                            livro['isbn13'] = texto.replace('ISBN ','').strip()
+                            livro['isbn13'] = texto.replace('ISBN ','').replace('-','').strip()
                         if('Título' in texto):
                             livro['title'] = texto.replace('Título ','').strip()
                         if('Participações' in texto):
-                            livro['authors'] = texto.replace('Participações ','').strip()
+                            linhas = texto.split('\n')
+                            autores = ''
+                            for linha in linhas:
+                                if('( Autor)' in linha):
+                                    autor = linha.replace('\r','').replace('( Autor)','').strip()
+                                    autores = autores + ';' + autor
+                            livro['authors'] = autores[1:]
                         
                         livro['isbn10'] = ''
 
@@ -243,7 +247,7 @@ def resolve(path):
     ranking = {}
     for sample in samples:
         check_output(['convert', path, '-resample', str(sample), chave])
-        valor = pytesseract.image_to_string(Image.open(chave), lang='eng', config='--oem 3')
+        valor = pytesseract.image_to_string(Image.open(chave), lang='eng', config='--oem 3').replace(' ','')
         if(valor not in ranking):
             ranking[valor] = 0
         ranking[valor] = ranking[valor] + 1

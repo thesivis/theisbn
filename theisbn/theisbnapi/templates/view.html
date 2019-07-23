@@ -24,13 +24,11 @@
         </div>
         {% if data %}
             <div class="detalhes">
-                <div class="form-group">
-                    <span class="font-weight-bold">Título:</span> {{ data.book.title }}
-                </div>
-
-                <div class="form-group">
-                    <span class="font-weight-bold">Autores:</span> {{ data.book.authors }}
-                </div>
+                {% for dado in dados %}
+                    <div class="form-group">
+                        <span class="font-weight-bold">{{dado.titulo}}:</span> {{ dado.valor }}
+                    </div>
+                {% endfor%}
             </div>
         {% endif %}
     </body>

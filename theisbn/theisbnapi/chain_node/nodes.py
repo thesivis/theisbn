@@ -255,6 +255,17 @@ def resolve(path):
     os.remove(chave)
     return valores[0][0]
 
+
+def campos():
+    return ['isbn13','title','authors','isbn10']
+
+def titulo(titulo):
+    titulos = {'isbn13': 'ISBN', 'title': 'Título','authors':'Autores', 'isbn10':'ISBN-10'}
+    if(titulo in titulos):
+        return titulos[titulo]
+    return None
+
+
 def search(isbn):
     local = LocalNode()
     isbnSearch = ISBNSearchNode()

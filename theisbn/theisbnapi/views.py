@@ -54,7 +54,14 @@ def searchview(request):
     if('isbn' in request.GET):
         data = do_search(request.GET)
         context['data'] = data
+        dados = []
+        if(data['status'] == 'ok'):
+            for campo in node.campos():
+                if(campo in data['book']):
+                    if(data['book'][campo]):
+                        dado = {'valor': data['book'][campo], 'titulo': node.titulo(campo)}
+                        dados.append(dado)
+        context['dados'] = dados
         context['isbn'] = request.GET['isbn']
-        print(data, type(data))
 
     return render(request, 'view.html', context)

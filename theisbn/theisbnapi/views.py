@@ -7,10 +7,14 @@ from django.core import serializers
 from dicttoxml import dicttoxml
 
 
+def do_search(parametros):
+    data = node.search(parametros)
+    return data
+
 def get_isbn(request):
     data = request.GET
     if('isbn' in request.GET):
-        data = node.search(request.GET)
+        data = do_search(request.GET)
         if('format' in request.GET):
             if(request.GET['format'] == 'xml'):
                 data = dicttoxml(data)
@@ -31,7 +35,7 @@ def get_isbns(request):
         response = []
         for isbn in isbns:
             parametros['isbn'] = isbn
-            data = node.search(parametros)
+            data = do_search(parametros)
             data['isbn'] = isbn
             response.append(data)
         if('format' in request.GET):
@@ -41,3 +45,16 @@ def get_isbns(request):
                 return HttpResponse(response, content_type='application/xml')
         return JsonResponse(response, safe=False)
     return JsonResponse({"status","erro"})
+
+
+
+def searchview(request):
+    context = {}
+    context['isbn'] = ''
+    if('isbn' in request.GET):
+        data = do_search(request.GET)
+        context['data'] = data
+        context['isbn'] = request.GET['isbn']
+        print(data, type(data))
+
+    return render(request, 'view.html', context)

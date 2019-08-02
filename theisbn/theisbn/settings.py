@@ -129,5 +129,5 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = False
 
-
+#Defini se os dados serão adicionados ao banco local para uma procura mais rápida posteriormente
 GRAVAR_LOCAL = False

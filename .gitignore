@@ -3,5 +3,4 @@
 lib
 *.pyc
 **/__pycache__
-**/my.cnf
 **/migrations

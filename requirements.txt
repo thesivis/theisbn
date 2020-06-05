@@ -3,7 +3,7 @@ bs4==0.0.1
 certifi==2019.3.9
 chardet==3.0.4
 dicttoxml==1.7.4
-Django==2.2.1
+Django==2.2.13
 django-cors-headers==3.0.2
 djangorestframework==3.9.4
 idna==2.8
